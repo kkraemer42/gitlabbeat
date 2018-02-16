@@ -33,7 +33,7 @@ It will create a clean git history for each major step. Note that you can always
 ### Build
 
 To build the binary for Gitlabbeat run the command below. This will generate a binary
-in the same directory with the name countbeat.
+in the same directory with the name gitlabbeat.
 
 ```
 make
@@ -45,10 +45,8 @@ make
 To run Gitlabbeat with debugging output enabled, run:
 
 ```
-./countbeat -c countbeat.yml -e -d "*"
+./gitlabbeat -c gitlabeat.yml -e -d "*"
 ```
-
-
 
 
 
@@ -60,35 +58,6 @@ which is automatically generated based on `fields.yml` by running the following 
 ```
 make update
 ```
-
-
-### Cleanup
-
-To clean  Gitlabbeat source code, run the following commands:
-
-```
-make fmt
-make simplify
-```
-
-To clean up the build directory and generated artifacts, run:
-
-```
-make clean
-```
-
-
-### Clone
-
-To clone Gitlabbeat from the git repository, run the following commands:
-
-```
-mkdir -p ${GOPATH}/src/github.com/kkraemer42/countbeat
-git clone https://github.com/kkraemer42/countbeat ${GOPATH}/src/github.com/kkraemer42/countbeat
-```
-
-
-For further development, check out the [beat developer guide](https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html).
 
 
 ## Packaging
