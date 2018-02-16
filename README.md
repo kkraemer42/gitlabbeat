@@ -1,18 +1,26 @@
-# Countbeat
+Welcome to Gitlabbeat.
 
-Welcome to Countbeat.
 
-Ensure that this folder is at the following location:
-`${GOPATH}/src/github.com/kkraemer42/countbeat`
 
-## Getting Started with Countbeat
+## Getting Started with Gitlabbeat
 
-### Requirements
+After cloning this project, you will need to place a 'beat.yml' in the ```_meta``` folder.
 
-* [Golang](https://golang.org/dl/) 1.7
+It's contents should look like this:
+
+```
+gitlabbeat:
+  # Defines how often an event is sent to the output
+  period: 20s
+
+  job_timeout: 10s
+
+  access_token: 'YOUR GITLAB ACCESS TOKEN'
+  gitlab_address: 'YOUR_GITLAB_ADDRESS/api/v4'
+```
 
 ### Init Project
-To get running with Countbeat and also install the
+To get running with Gitlabbeat and also install the
 dependencies, run the following command:
 
 ```
@@ -21,18 +29,10 @@ make setup
 
 It will create a clean git history for each major step. Note that you can always rewrite the history if you wish before pushing your changes.
 
-To push Countbeat in the git repository, run the following commands:
-
-```
-git remote set-url origin https://github.com/kkraemer42/countbeat
-git push origin master
-```
-
-For further development, check out the [beat developer guide](https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html).
 
 ### Build
 
-To build the binary for Countbeat run the command below. This will generate a binary
+To build the binary for Gitlabbeat run the command below. This will generate a binary
 in the same directory with the name countbeat.
 
 ```
@@ -42,30 +42,15 @@ make
 
 ### Run
 
-To run Countbeat with debugging output enabled, run:
+To run Gitlabbeat with debugging output enabled, run:
 
 ```
 ./countbeat -c countbeat.yml -e -d "*"
 ```
 
 
-### Test
 
-To test Countbeat, run the following command:
 
-```
-make testsuite
-```
-
-alternatively:
-```
-make unit-tests
-make system-tests
-make integration-tests
-make coverage-report
-```
-
-The test coverage is reported in the folder `./build/coverage/`
 
 ### Update
 
@@ -79,7 +64,7 @@ make update
 
 ### Cleanup
 
-To clean  Countbeat source code, run the following commands:
+To clean  Gitlabbeat source code, run the following commands:
 
 ```
 make fmt
@@ -95,7 +80,7 @@ make clean
 
 ### Clone
 
-To clone Countbeat from the git repository, run the following commands:
+To clone Gitlabbeat from the git repository, run the following commands:
 
 ```
 mkdir -p ${GOPATH}/src/github.com/kkraemer42/countbeat
