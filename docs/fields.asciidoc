@@ -9,13 +9,13 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 [partintro]
 
 --
-This document describes the fields that are exported by countbeat. They are
+This document describes the fields that are exported by gitlabbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
-* <<exported-fields-countbeat>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-gitlabbeat>>
 * <<exported-fields-kubernetes-processor>>
 
 --
@@ -166,22 +166,6 @@ Name of the project in Google Cloud.
 Region in which this host is running.
 
 
-[[exported-fields-countbeat]]
-== countbeat fields
-
-None
-
-
-[float]
-=== `counter`
-
-type: long
-
-required: True
-
-PLEASE UPDATE DOCUMENTATION
-
-
 [[exported-fields-docker-processor]]
 == Docker fields
 
@@ -220,6 +204,22 @@ Container name.
 type: object
 
 Image labels.
+
+
+[[exported-fields-gitlabbeat]]
+== gitlabbeat fields
+
+None
+
+
+[float]
+=== `counter`
+
+type: long
+
+required: True
+
+PLEASE UPDATE DOCUMENTATION
 
 
 [[exported-fields-kubernetes-processor]]

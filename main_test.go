@@ -1,12 +1,12 @@
 package main
 
-// This file is mandatory as otherwise the countbeat.test binary is not generated correctly.
+// This file is mandatory as otherwise the gitlabbeat.test binary is not generated correctly.
 
 import (
 	"flag"
 	"testing"
 
-	"github.com/kkraemer42/countbeat/cmd"
+	"github.com/kkraemer42/gitlabbeat/cmd"
 )
 
 var systemTest *bool

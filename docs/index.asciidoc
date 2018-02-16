@@ -1,5 +1,5 @@
-= Countbeat Docs
+= Gitlabbeat Docs
 
-Welcome to the Countbeat documentation.
+Welcome to the Gitlabbeat documentation.
 
 

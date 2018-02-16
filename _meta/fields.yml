@@ -1,5 +1,5 @@
-- key: countbeat
-  title: countbeat
+- key: gitlabbeat
+  title: gitlabbeat
   description:
   fields:
     - name: counter
@@ -7,4 +7,3 @@
       required: true
       description: >
         PLEASE UPDATE DOCUMENTATION
-

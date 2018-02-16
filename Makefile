@@ -1,5 +1,5 @@
-BEAT_NAME=countbeat
-BEAT_PATH=github.com/kkraemer42/countbeat
+BEAT_NAME=gitlabbeat
+BEAT_PATH=github.com/kkraemer42/gitlabbeat
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 BEAT_URL=https://${BEAT_PATH}
 SYSTEM_TESTS=false
@@ -36,7 +36,7 @@ git-init:
 	git commit -m "Add git settings"
 	git add .
 	git reset -- .travis.yml
-	git commit -m "Add countbeat"
+	git commit -m "Add gitlabbeat"
 	git add .travis.yml
 	git commit -m "Add Travis CI"
 

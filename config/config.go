@@ -6,11 +6,11 @@ package config
 import "time"
 
 type Config struct {
-	Period time.Duration `config:"period"`
-	Path   string        `config:"path"`
+	Period       time.Duration `config:"period"`
+	AccessToken  string        `config:"access_token`
+	GitlabAdress string        `config:"gitlab_address`
 }
 
 var DefaultConfig = Config{
 	Period: 1 * time.Second,
-	Path:   ".",
 }
