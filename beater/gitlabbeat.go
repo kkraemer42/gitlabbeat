@@ -41,17 +41,18 @@ func (bt *Gitlabbeat) Run(b *beat.Beat) error {
 	var err error
 	bt.client, err = b.Publisher.Connect()
 
-	git := gitlab.NewClient(nil, bt.config.AccessToken)
+	//git := gitlab.NewClient(nil, bt.config.AccessToken)
+	git := gitlab.NewClient(nil, "k8JGGxHJRjAxANoGqimh")
 
 	if err != nil {
 		return err
 	}
 
 	bt.git = git
-	git.SetBaseURL(bt.config.gitlab_address)
+	//git.SetBaseURL(bt.config.GitlabAdress)
+	git.SetBaseURL("https://gitlab.ballpark.altemista.cloud/api/v4")
 
 	ticker := time.NewTicker(bt.config.Period)
-	counter := 1
 
 	for {
 		select {
@@ -60,40 +61,175 @@ func (bt *Gitlabbeat) Run(b *beat.Beat) error {
 		case <-ticker.C:
 			logp.Info("Collecting events.")
 
-			bt.getDeployKeys()
-			//	bt.collectOrgsEvents(jobCtx, bt.config.Orgs)
+			//bt.getMergeRequests()
+			bt.getIssues()
+			//bt.getUsers()
 
 		}
 
 		logp.Info("Event sent")
-		counter++
 	}
 }
 
-func (bt *Gitlabbeat) getDeployKeys() {
+func (bt *Gitlabbeat) getMergeRequests() {
 
-	res, _, err := bt.git.DeployKeys.ListAllDeployKeys()
+	res, _, err := bt.git.MergeRequests.ListMergeRequests(&gitlab.ListMergeRequestsOptions{})
 	if err != nil {
-		logp.Err("Failed to collect event, got :", err)
+		logp.Err("Failed to collect Merge Requests, got :", err)
 		return
 	}
 
-	for _, label := range res {
-		bt.client.Publish(bt.newLabelsEvent(label))
+	for _, mergeRequest := range res {
+		bt.client.Publish(bt.newMergeRequestEvent(mergeRequest))
 
 	}
 
 }
 
-func (Gitlabbeat) newLabelsEvent(label *gitlab.DeployKey) beat.Event {
+/*
+func (bt *Gitlabbeat) getPipelines() {
+
+	res, _, err := bt.git.Projects.ListProjects(nil, nil)
+	if err != nil {
+		logp.Err("Failed to collect Merge Requests, got :", err)
+		return
+	}
+
+	for _, projects := range res {
+		for _, pipeline := range projects {
+
+
+			bt.client.Publish(bt.newPipelineEvent(pipeline))
+
+		}
+
+		bt.client.Publish(bt.newPipelineEvent(pipeline))
+
+	}
+
+}
+
+*/
+
+func (bt *Gitlabbeat) getIssues() {
+
+	/*
+		opt := &gitlab.ListIssuesOptions{
+			Scope: gitlab.String("all"),
+		}
+	*/
+
+	var page = 0
+	var bool = true
+	for bool != true {
+
+		res, _, err := bt.git.Issues.ListIssues(&gitlab.ListIssuesOptions{
+			Scope: gitlab.String("all"),
+			PerPage: gitlab.String("100"),
+			Page: gitlab.String(page),
+			
+	
+		})
+		if err != nil {
+			logp.Err("Failed to collect event, got :", err)
+			return
+		}
+
+		if(bt.git.BaseURL != 0){
+			page++
+		} else {
+			bool = false
+		}
+
+	}
+
+
+	
+
+	for _, issue := range res {
+		bt.client.Publish(bt.newIssueEvent(issue))
+
+	}
+
+}
+
+func (bt *Gitlabbeat) getUsers() {
+
+	res, _, err := bt.git.Users.ListUsers(&gitlab.ListUsersOptions{})
+	if err != nil {
+		logp.Err("Failed to collect Users, got :", err)
+		return
+	}
+
+	for _, user := range res {
+		bt.client.Publish(bt.newUserEvent(user))
+
+	}
+
+}
+
+func (Gitlabbeat) newUserEvent(user *gitlab.User) beat.Event {
 
 	event := beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
-			"type":   "gitlabbeat",
-			"key_id": label.ID,
-			"push":   label.CanPush,
-			"title":  label.Title,
+			"type":             "gitlabbeat",
+			"user_id":          user.ID,
+			"user_mail":        user.Email,
+			"user_adminstatus": user.IsAdmin,
+			"user_state":       user.State,
+		},
+	}
+
+	return event
+}
+
+func (Gitlabbeat) newMergeRequestEvent(mergeRequest *gitlab.MergeRequest) beat.Event {
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":                     "gitlabbeat",
+			"mergeRequestId":           mergeRequest.ID,
+			"mergeRequestCreationDate": mergeRequest.CreatedAt,
+			"mergeRequestTitle":        mergeRequest.Title,
+			"mergeRequestAssignee":     mergeRequest.Assignee,
+		},
+	}
+
+	return event
+}
+
+func (Gitlabbeat) newPipelineEvent(pipeline *gitlab.Pipeline) beat.Event {
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":              "gitlabbeat",
+			"pipelineId":        pipeline.ID,
+			"pipelineStartTime": pipeline.StartedAt,
+			"pipelineStatus":    pipeline.Status,
+			"pipelineDuration":  pipeline.Duration,
+		},
+	}
+
+	return event
+}
+
+func (Gitlabbeat) newIssueEvent(issue *gitlab.Issue) beat.Event {
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":            "gitlabbeat",
+			"issueId":         issue.ID,
+			"issueTitle":      issue.Title,
+			"issueMilestone":  issue.Milestone,
+			"issueState":      issue.State,
+			"issueLastUpdate": issue.UpdatedAt,
+			"issueAssignees":  issue.Assignees,
+			"issueProject":    issue.ProjectID,
+			"issueDueDate":    issue.DueDate,
 		},
 	}
 

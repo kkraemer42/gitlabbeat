@@ -4,8 +4,8 @@ gitlabbeat:
 
   job_timeout: 10s
 
-  access_token: 'YOUR GITLAB ACCESS TOKEN'
-  gitlab_address: 'YOUR_GITLAB_ADDRESS/api/v4'
+  access_token: k8JGGxHJRjAxANoGqimh
+  gitlab_address: https://gitlab.ballpark.altemista.cloud/api/v4
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
