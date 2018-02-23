@@ -1,8 +1,3 @@
 gitlabbeat:
   # Defines how often an event is sent to the output
-  period: 20s
-
   job_timeout: 10s
-
-  access_token: 'YOUR GITLAB ACCESS TOKEN'
-  gitlab_address: 'YOUR_GITLAB_ADDRESS/api/v4'

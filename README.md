@@ -1,22 +1,16 @@
 Welcome to Gitlabbeat.
 
-
-
 ## Getting Started with Gitlabbeat
 
-###IMPORTANT (DO THIS FIRST)###
+###IMPORTANT###
+
+In order to run this beat, you will have to define the following environment variables:
+
+```
+AccessToken: YourAccessToken
+GitlabAddress: https://'your-gitlab-address'/api/v4
+```
 After cloning this project, you will need to change the 'beat.yml' in the ```_meta``` folder:
-
-```
-gitlabbeat:
-  # Defines how often an event is sent to the output
-  period: 20s
-
-  job_timeout: 10s
-
-  access_token: 'YOUR GITLAB ACCESS TOKEN'
-  gitlab_address: 'YOUR_GITLAB_ADDRESS/api/v4'
-```
 
 ### Init Project
 To get running with Gitlabbeat and also install the

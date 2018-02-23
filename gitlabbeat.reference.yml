@@ -1,11 +1,8 @@
 gitlabbeat:
   # Defines how often an event is sent to the output
-  period: 20s
 
   job_timeout: 10s
 
-  access_token: k8JGGxHJRjAxANoGqimh
-  gitlab_address: https://gitlab.ballpark.altemista.cloud/api/v4
 #================================ General ======================================
 
 # The name of the shipper that publishes the network data. It can be used to group

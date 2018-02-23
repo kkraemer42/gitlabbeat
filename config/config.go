@@ -7,8 +7,8 @@ import "time"
 
 type Config struct {
 	Period       time.Duration `config:"period"`
-	AccessToken  string        `config:"access_token`
-	GitlabAdress string        `config:"gitlab_address`
+	AccessToken  string        `config:"access_token"`
+	GitlabAdress string        `config:"gitlab_address"`
 }
 
 var DefaultConfig = Config{

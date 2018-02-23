@@ -2,6 +2,7 @@ package beater
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -20,7 +21,7 @@ type Gitlabbeat struct {
 	client beat.Client
 }
 
-// Creates beater
+// New Creates beater
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
@@ -34,25 +35,28 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
-// The function Run runs the beat
+//Run runs the beat
 func (bt *Gitlabbeat) Run(b *beat.Beat) error {
 	logp.Info("gitlabbeat is running! Hit CTRL-C to stop it.")
 
 	var err error
 	bt.client, err = b.Publisher.Connect()
 
-	//git := gitlab.NewClient(nil, bt.config.AccessToken)
-	git := gitlab.NewClient(nil, "k8JGGxHJRjAxANoGqimh")
+	git := gitlab.NewClient(nil, os.Getenv("AccessToken"))
 
 	if err != nil {
 		return err
 	}
 
 	bt.git = git
-	//git.SetBaseURL(bt.config.GitlabAdress)
-	git.SetBaseURL("https://gitlab.ballpark.altemista.cloud/api/v4")
+	git.SetBaseURL(os.Getenv("GitlabAddress"))
 
-	ticker := time.NewTicker(bt.config.Period)
+	var period, error = time.ParseDuration(os.Getenv("CollectionPeriod"))
+	if error != nil {
+		return err
+	}
+	ticker := time.NewTicker(period)
+	//	ticker := time.NewTicker(bt.config.Period)
 
 	for {
 		select {
@@ -61,9 +65,9 @@ func (bt *Gitlabbeat) Run(b *beat.Beat) error {
 		case <-ticker.C:
 			logp.Info("Collecting events.")
 
-			//bt.getMergeRequests()
-			bt.getIssues()
+			bt.getMergeRequests()
 			//bt.getUsers()
+			bt.getIssues()
 
 		}
 
@@ -71,6 +75,7 @@ func (bt *Gitlabbeat) Run(b *beat.Beat) error {
 	}
 }
 
+/*
 func (bt *Gitlabbeat) getMergeRequests() {
 
 	res, _, err := bt.git.MergeRequests.ListMergeRequests(&gitlab.ListMergeRequestsOptions{})
@@ -86,10 +91,66 @@ func (bt *Gitlabbeat) getMergeRequests() {
 
 }
 
+*/
+
+func (bt *Gitlabbeat) getMergeRequests() {
+
+	var page = 0
+	var bool = true
+	for bool != false {
+
+		result, response, err := bt.git.MergeRequests.ListMergeRequests(&gitlab.ListMergeRequestsOptions{
+			ListOptions: gitlab.ListOptions{Page: page, PerPage: 100},
+			Scope:       gitlab.String("all"),
+			State:       gitlab.String("opened"),
+		})
+		if err != nil {
+			logp.Err("Failed to collect mergeRequests, got :", err)
+			return
+		}
+
+		if response.NextPage != 0 {
+			page++
+		} else {
+			bool = false
+		}
+
+		for _, mergeRequest := range result {
+			bt.client.Publish(bt.newMergeRequestEvent(mergeRequest))
+
+		}
+
+	}
+
+}
+
 /*
 func (bt *Gitlabbeat) getPipelines() {
 
-	res, _, err := bt.git.Projects.ListProjects(nil, nil)
+	var page = 0
+	var bool = true
+	for bool != false {
+
+	result, response, err := bt.git.Projects.ListProjects(&gitlab.ListProjectsOptions{
+		ListOptions: gitlab.ListOptions{Page: page, PerPage: 100},
+
+	})
+	if err != nil {
+		logp.Err("Failed to collect Merge Requests, got :", err)
+		return
+	}
+
+	for _, project := range result {
+		pipelines, piperesponse, err := bt.git.Pipelines.ListProjectPipelines()
+	}
+
+}
+
+	result, response, err := bt.git.Pipelines.ListProjectPipelines(&gitlab.ListMergeRequestsOptions{
+		ListOptions: gitlab.ListOptions{Page: page, PerPage: 100},
+		Scope:       gitlab.String("all"),
+		State:       gitlab.String("opened"),
+	})
 	if err != nil {
 		logp.Err("Failed to collect Merge Requests, got :", err)
 		return
@@ -108,46 +169,34 @@ func (bt *Gitlabbeat) getPipelines() {
 	}
 
 }
-
 */
 
 func (bt *Gitlabbeat) getIssues() {
 
-	/*
-		opt := &gitlab.ListIssuesOptions{
-			Scope: gitlab.String("all"),
-		}
-	*/
-
 	var page = 0
 	var bool = true
-	for bool != true {
+	for bool != false {
 
-		res, _, err := bt.git.Issues.ListIssues(&gitlab.ListIssuesOptions{
-			Scope: gitlab.String("all"),
-			PerPage: gitlab.String("100"),
-			Page: gitlab.String(page),
-			
-	
+		result, response, err := bt.git.Issues.ListIssues(&gitlab.ListIssuesOptions{
+			ListOptions: gitlab.ListOptions{Page: page, PerPage: 100},
+			Scope:       gitlab.String("all"),
+			State:       gitlab.String("opened"),
 		})
 		if err != nil {
-			logp.Err("Failed to collect event, got :", err)
+			logp.Err("Failed to collect issues, got :", err)
 			return
 		}
 
-		if(bt.git.BaseURL != 0){
+		if response.NextPage != 0 {
 			page++
 		} else {
 			bool = false
 		}
 
-	}
+		for _, issue := range result {
+			bt.client.Publish(bt.newIssueEvent(issue))
 
-
-	
-
-	for _, issue := range res {
-		bt.client.Publish(bt.newIssueEvent(issue))
+		}
 
 	}
 
@@ -155,14 +204,28 @@ func (bt *Gitlabbeat) getIssues() {
 
 func (bt *Gitlabbeat) getUsers() {
 
-	res, _, err := bt.git.Users.ListUsers(&gitlab.ListUsersOptions{})
-	if err != nil {
-		logp.Err("Failed to collect Users, got :", err)
-		return
-	}
+	var page = 0
+	var bool = true
+	for bool != false {
 
-	for _, user := range res {
-		bt.client.Publish(bt.newUserEvent(user))
+		result, response, err := bt.git.Users.ListUsers(&gitlab.ListUsersOptions{
+			ListOptions: gitlab.ListOptions{Page: page, PerPage: 100},
+		})
+		if err != nil {
+			logp.Err("Failed to collect users, got :", err)
+			return
+		}
+
+		if response.NextPage != 0 {
+			page++
+		} else {
+			bool = false
+		}
+
+		for _, user := range result {
+			bt.client.Publish(bt.newUserEvent(user))
+
+		}
 
 	}
 
