@@ -1,22 +1,24 @@
-Welcome to Gitlabbeat.
+Welcome to Gitlabbeat
 
 ## Getting Started with Gitlabbeat
 
-###IMPORTANT###
+###IMPORTANT
 
 In order to run this beat, you will have to define the following environment variables:
 
 ```
-AccessToken: YourAccessToken
-GitlabAddress: https://'your-gitlab-address'/api/v4
+ACCESSTOKEN: YourAccessToken
+GITLABADRESS: https://'your-gitlab-address'/api/v4
+COLLECTIONPERIOD: Time period for data collection (e.g., 10s)
+PROJECTID: The Project you are about to monitor.
 ```
-After cloning this project, you will need to change the 'beat.yml' in the ```_meta``` folder:
 
 ### Init Project
 To get running with Gitlabbeat and also install the
-dependencies, run the following command:
+dependencies, run the following commands:
 
 ```
+go get
 make setup
 ```
 
